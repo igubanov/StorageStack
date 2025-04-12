@@ -3,7 +3,7 @@ local CDGBS = ZO_Object:Subclass()
 CDGBS.Name = "CDGBankStack"
 CDGBS.NameSpaced = "CDG Bank Stacker"
 CDGBS.Author = "|cFFA500CrazyDutchGuy|r"
-CDGBS.Version = "1.13"
+CDGBS.Version = "1.14"
 CDGBS.defaults = {
 	logToDefaultChat = true,
 	logToCDGShowLoot = true,
@@ -56,7 +56,7 @@ function CDGBS:EVENT_OPEN_BANK(...)
 					if not bagSlotData.stolen and bankSlotData.rawName == bagSlotData.rawName and (not self.SV.ignoreSavedItems or (self.SV.ignoreSavedItems and not self:IsItemProtected(BAG_BACKPACK, bagSlot))) then
 						local bagStack, bagMaxStack = GetSlotStackSize(BAG_BACKPACK, bagSlot)
 						local bagItemLink = GetItemLink(BAG_BACKPACK, bagSlot, LINK_STYLE_DEFAULT)
-						local quantity = zo_min(bagStack, bankMaxStack - bankStack) 
+						local quantity = zo_min(bagStack, bankMaxStack - bankStack)
 
 						if IsProtectedFunction("RequestMoveItem") then
 							CallSecureProtected("RequestMoveItem", BAG_BACKPACK, bagSlot, BAG_BANK, bankSlot, quantity)
@@ -77,7 +77,6 @@ function CDGBS:EVENT_OPEN_BANK(...)
 		end
 	end
 end
-
 
 function CDGBS:CreateLAM2Panel()
 	local panelData = {
@@ -112,20 +111,21 @@ function CDGBS:CreateLAM2Panel()
 		},
 		{
 			type = "description",
-			text = "|cEFEBBECrazyDutchGuy's Bank Stacker|r is an addon that automatically moves items from your backpack onto unfilled stacks in your bank.",
+			text =
+			"|cEFEBBECrazyDutchGuy's Bank Stacker|r is an addon that automatically moves items from your backpack onto unfilled stacks in your bank.",
 		}
 	}
 
 	local LAM2 = LibStub:GetLibrary("LibAddonMenu-2.0")
-	LAM2:RegisterAddonPanel(self.Name.."LAM2Options", panelData)
-	LAM2:RegisterOptionControls(self.Name.."LAM2Options", optionsData)
-end 
+	LAM2:RegisterAddonPanel(self.Name .. "LAM2Options", panelData)
+	LAM2:RegisterOptionControls(self.Name .. "LAM2Options", optionsData)
+end
 
 function CDGBS:EVENT_ADD_ON_LOADED(eventCode, addOnName, ...)
 	if (addOnName == self.Name) then
 		EVENT_MANAGER:UnregisterForEvent(self.Name, EVENT_ADD_ON_LOADED)
 
-		self.SV = ZO_SavedVars:New(self.Name.."_SV", 1, nil, self.defaults)
+		self.SV = ZO_SavedVars:New(self.Name .. "_SV", 1, nil, self.defaults)
 
 		self:CreateLAM2Panel()
 
