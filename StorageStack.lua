@@ -3,7 +3,7 @@ local CDGBS = ZO_Object:Subclass()
 CDGBS.Name = "StorageStack"
 CDGBS.NameSpaced = "Storage Stacker"
 CDGBS.Author = "|cFFA500CrazyDutchGuy updated xIvanGx|r"
-CDGBS.Version = "0.1"
+CDGBS.Version = "0.1.1"
 CDGBS.defaults = {
 	logToDefaultChat = true,
 	logToCDGShowLoot = true,
@@ -129,7 +129,7 @@ function CDGBS:CreateLAM2Panel()
 		}
 	}
 
-	local LAM2 = LibStub:GetLibrary("LibAddonMenu-2.0")
+	local LAM2 = LibAddonMenu2
 	LAM2:RegisterAddonPanel(self.Name .. "LAM2Options", panelData)
 	LAM2:RegisterOptionControls(self.Name .. "LAM2Options", optionsData)
 end
