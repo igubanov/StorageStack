@@ -1,9 +1,9 @@
 local CDGBS = ZO_Object:Subclass()
 
-CDGBS.Name = "CDGBankStack"
-CDGBS.NameSpaced = "CDG Bank Stacker"
-CDGBS.Author = "|cFFA500CrazyDutchGuy|r"
-CDGBS.Version = "1.14"
+CDGBS.Name = "StorageStack"
+CDGBS.NameSpaced = "Storage Stacker"
+CDGBS.Author = "|cFFA500CrazyDutchGuy updated xIvanGx|r"
+CDGBS.Version = "0.1"
 CDGBS.defaults = {
 	logToDefaultChat = true,
 	logToCDGShowLoot = true,
@@ -43,13 +43,25 @@ function CDGBS:IsItemProtected(bagId, slotId)
 	return false
 end
 
-function CDGBS:EVENT_OPEN_BANK(...)
-	local bankCache = SHARED_INVENTORY:GetOrCreateBagCache(BAG_BANK)
+function CDGBS:EVENT_OPEN_BANK(eventCode, bankBag, ...)
+	if not (IsHouseBankBag(bankBag) or bankBag == BAG_BANK) then return end
+
+	local bankCache = SHARED_INVENTORY:GetOrCreateBagCache(bankBag)
 	local bagCache  = SHARED_INVENTORY:GetOrCreateBagCache(BAG_BACKPACK)
+	local bagName   = 'Bank'
+
+	if IsHouseBankBag(bankBag) then
+		local interactName, nickname = SHARED_INVENTORY:GetHouseBankingBagName(bankBag)
+		if nickname and nickname ~= "" then
+			bagName = nickname
+		else
+			bagName = interactName
+		end
+	end
 
 	for bankSlot, bankSlotData in pairs(bankCache) do
 		if not (bankSlotData.itemType == ITEMTYPE_FOOD or bankSlotData.itemType == ITEMTYPE_DRINK or bankSlotData.itemType == ITEMTYPE_POTION or bankSlotData.itemType == ITEMTYPE_SOUL_GEM or bankSlotData.itemType == ITEMTYPE_TOOL) then
-			local bankStack, bankMaxStack = GetSlotStackSize(BAG_BANK, bankSlot)
+			local bankStack, bankMaxStack = GetSlotStackSize(bankBag, bankSlot)
 
 			if bankStack > 0 and bankStack < bankMaxStack then
 				for bagSlot, bagSlotData in pairs(bagCache) do
@@ -59,12 +71,13 @@ function CDGBS:EVENT_OPEN_BANK(...)
 						local quantity = zo_min(bagStack, bankMaxStack - bankStack)
 
 						if IsProtectedFunction("RequestMoveItem") then
-							CallSecureProtected("RequestMoveItem", BAG_BACKPACK, bagSlot, BAG_BANK, bankSlot, quantity)
+							CallSecureProtected("RequestMoveItem", BAG_BACKPACK, bagSlot, bankBag, bankSlot, quantity)
 						else
-							RequestMoveItem(BAG_BACKPACK, bagSlot, BAG_BANK, bankSlot, quantity)
+							RequestMoveItem(BAG_BACKPACK, bagSlot, bankBag, bankSlot, quantity)
 						end
 
-						self:LogActionToChat(zo_strformat("Banked [<<1>>/<<2>>] <<t:3>>", quantity, bagStack, bagItemLink))
+						self:LogActionToChat(zo_strformat("<<1>> [<<2>>/<<3>>] <<t:4>>", bagName, quantity, bagStack,
+							bagItemLink))
 
 						bankStack = bankStack + quantity
 
@@ -112,7 +125,7 @@ function CDGBS:CreateLAM2Panel()
 		{
 			type = "description",
 			text =
-			"|cEFEBBECrazyDutchGuy's Bank Stacker|r is an addon that automatically moves items from your backpack onto unfilled stacks in your bank.",
+			"|cEFEBBEStorage Stacker: based on CrazyDutchGuy's Bank Stacker|r is an addon that automatically moves items from your backpack into your bank, if there is an unfilled stack allready in the bank + add feature to move in house storages (chests).",
 		}
 	}
 
